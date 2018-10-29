@@ -1,9 +1,10 @@
 
 import sys
+import os
 
 #a light version of cmssw for doing analysis workflow
 
-_env_path = '/Users/tabris/programs/xflow/core/'
+_env_path = os.path.dirname(os.path.realpath(__file__)).replace("/python","/")
 
 class nodeBase(object):
     """ base for all the node

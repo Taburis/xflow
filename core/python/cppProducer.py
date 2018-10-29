@@ -1,4 +1,5 @@
 
+import errno
 import os
 
 _runfactory_path ='/Users/tabris/programs/xflow/core/run/' 
@@ -26,6 +27,11 @@ class cppProducer(object):
     def addInterface(self):
         self.get_interface_list(self.chain)
         for src_ in self.interfaceList:
-            if os.path.exists(src_): print src_+" not exists!"
+            if not os.path.isfile(src_):
+                raise IOError(errno.ENOENT, 'Not found c++ object file: ', src_)
+            #raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), src_)
             self.cppfile.write("#include \""+src_+"\"\n")
+
+    def placeMain(self):
+        self.cppfile.write("\n int main(){\n")
 
