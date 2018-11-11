@@ -1,0 +1,31 @@
+
+CC = g++
+ROOT = -pthread -stdlib=libc++ -std=c++11 -m64 -I/Applications/root_v6.14.04/include -L/Applications/root_v6.14.04/lib -lGui -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lROOTDataFrame -lROOTVecOps -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl -Wl,-rpath,/Applications/root_v6.14.04/lib 
+CFLAGS = -fpic -g $(ROOT)
+LDFLAGS = -shared $(ROOT)
+DEPS = $(shell echo *.h)
+LPATH = $(shell echo /Users/tabris/xflow/core/src/)
+#CFLAGSFORDYLIB = -c -shared -fpic $(ROOT)
+
+all: main
+
+#%.o: %.c $(DEPS)
+#	$(CC) -c -o $@ $(CFLAGS)
+
+main.o: main.cc 
+	$(CC) -o main.o -c main.cc $(ROOT) 
+
+libedm.so: rootEDM.o
+	$(CC) -shared rootEDM.o -o libedm.so $(ROOT)
+
+rootEDM.o: rootEDM.cc rootEDM.h
+	$(CC) rootEDM.cc -c -fpic $(ROOT)
+
+main: main.o libedm.so
+	$(CC) -o main main.o -I $(LPATH) -L $(LPATH) -ledm $(ROOT)  
+
+
+.PHONY: clean
+
+clean:
+	rm -rf *.o *.so
