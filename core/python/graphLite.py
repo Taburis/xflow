@@ -15,14 +15,19 @@ class nodeLite_base (object):
     def run_eval_func(self):
         if(self.check_if_callable) : self.eval_func()
 
-#class sparseMatrix (object):
-#    """
-#    a sparse matrix ojbect
-#    """
-#    def __init__(self):
-#        holder_ = []
+class node_maker (object):
+    """
+    a node module should be easy to use
+    """
+    def __init__(self):
+        """empty creation """
 
-class graphLite_base (object):
+    def morphism(self, func):
+        nd = nodeLite_base()
+        nd.eval_func = func
+        return nd
+
+class graphLite_base (nodeLite_base):
     """
     a graph is actually represented by a sparse matrix: called map_ to represent the connection between sets of nodes
     """
@@ -122,7 +127,7 @@ class graphLite_base (object):
     def forward_propagate(self, ptr, fchain):
         if self.is_head(ptr):
             fchain.append(ptr)
-            for key in self.map_[self.get_node_id(ptr)].keys():
+            for key in list(self.map_[self.get_node_id(ptr)].keys()):
                 if self.get_link_weight(ptr,key)>0 : 
                     self.cut_link(ptr, key)
                     self.forward_propagate(key, fchain)

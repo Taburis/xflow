@@ -17,11 +17,11 @@ TTree* rootEDMFrame::regTree(const char* tn){
 		return _forest[tn];
 }
 
-TTree* rootEDMAnalyzer::handle(const char* t){
+TTree* rootEDMProducer::handle(const char* t){
 		return _edmFrame->regTree(t);
 }
 
-void rootEDMFrame::addAnalyzer(rootEDMAnalyzer * ana){
+void rootEDMFrame::addProducer(rootEDMProducer * ana){
 		_analyzer.push_back(ana);
 }
 void rootEDMFrame::addEventFilter(rootEDMEventFilter * filter){
@@ -66,10 +66,10 @@ void rootEDMFrame::eventLoop(){
 		}
 		Long64_t nevt = (*_forest.begin()).second->GetEntries();
 		if( EventMax == -1 ) EventMax = nevt;
-		TTree* t = (TTree*)_infile->Get("genParticleTree");
+	//	TTree* t = (TTree*)_infile->Get("genParticleTree");
 		std::cout<<"starting the event loop.."<<std::endl;
 		for(Long64_t ievt=0; ievt< EventMax ; ++ievt){
-				int j=0;
+				if(ievt % 1000 == 0) std::cout<<"processing "<<ievt<<"th event.."<<std::endl;
 				for(auto _ip= _forest.begin(); _ip!= _forest.end(); ++_ip) {
 						((*_ip).second)->GetEntry(ievt); 
 				}
@@ -77,11 +77,9 @@ void rootEDMFrame::eventLoop(){
 		}
 
 		runEndSection();
+		_done();
+//		_infile->Close();
 }
 
-rootEDMFrame::~rootEDMFrame(){
-		_analyzer.clear();
-		_forest.clear();
-}
 
 

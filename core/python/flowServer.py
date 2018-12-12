@@ -2,7 +2,7 @@
 
 from graph import *
 
-class flowServer(nodeLite_base) :
+class flowServer(nodeLite_base, node_maker) :
     '''
     the node used to accept the graphs and run the forward path
     '''
@@ -15,7 +15,7 @@ class flowServer(nodeLite_base) :
         self.path_ = self.graph_.key2node_list(keylist)
 
     def eval_func(self):
-        print self.path_
+        print (self.path_)
         for node in self.path_:
             node.run_eval_func()
 
@@ -23,6 +23,6 @@ class node_test (nodeLite_base):
     def __init__(self, name):
         self.name_ = name
     def eval_func(self):
-        print self.name_
+        print (self.name_)
 
 

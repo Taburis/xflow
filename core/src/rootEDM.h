@@ -1,28 +1,31 @@
 
+//#include <mach/mach.h>
 #include <vector>
 #include <unordered_map>
 #include <iostream>
 #include "TTree.h"
+#include "node.h"
 
-class rootEDM { 
+
+class rootEDMPlugin { 
 		// root event data model base class, used for any class related to root analysis
-		public : rootEDM(){}; ~rootEDM(){};
+		public : rootEDMPlugin(){}; ~rootEDMPlugin(){};
 				 //					 virtual void begin(const PSet &) = 0;
 };
 
 
-class rootEDMAnalyzer : public rootEDM {
-		public : rootEDMAnalyzer (){};
-				 ~rootEDMAnalyzer () {};
+class rootEDMProducer : public rootEDMPlugin {
+		public : rootEDMProducer (){};
+				 virtual ~rootEDMProducer () {};
 				 TTree* handle(const char * t);
 				 virtual void beginJob() = 0; 
 				 virtual void analyzer() = 0; 
 				 virtual void endJob() = 0;
 };
 
-class rootEDMEventFilter : public rootEDM {
+class rootEDMEventFilter : public rootEDMPlugin {
 		public : rootEDMEventFilter(){};
-				 ~rootEDMEventFilter(){};
+				 virtual ~rootEDMEventFilter(){};
 				 virtual void beginJob() = 0;
 				 virtual void endJob() = 0;
 				 // convention for the filter:
@@ -30,14 +33,19 @@ class rootEDMEventFilter : public rootEDM {
 				 virtual bool filter() = 0;
 };
 
-class rootEDMFrame : public rootEDM{
+class rootEDMFrame : public node{
 		// every edm has to be run with a frame 
 		public : rootEDMFrame(){};
-				 ~rootEDMFrame();
+				 ~rootEDMFrame(){
+						 std::cout<<"deleting rootEDMFrame"<<std::endl;
+						 for(auto & it : _analyzer) delete it;
+						 for(auto & it : _evtfilter) delete it;
+						 for(auto & it : _forest) delete it.second;
+				 };
 				 void eventLoop();
 				 TFile* open(const char*);
 				 TTree* regTree(const char* t);
-				 void addAnalyzer(rootEDMAnalyzer * );
+				 void addProducer(rootEDMProducer * );
 				 void addEventFilter(rootEDMEventFilter * );
 				 void runBeginSection();
 				 void runEndSection();
@@ -45,7 +53,7 @@ class rootEDMFrame : public rootEDM{
 		public :
 				 TFile* _infile;
 				 Long64_t EventMax = 1;
-				 std::vector<rootEDMAnalyzer * > _analyzer;
+				 std::vector<rootEDMProducer * > _analyzer;
 				 std::vector<rootEDMEventFilter * > _evtfilter;
 				 std::vector<void (*)()> begin_seq;
 				 std::unordered_map<std::string, TTree*> _forest;

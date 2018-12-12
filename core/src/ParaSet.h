@@ -1,8 +1,10 @@
 
-#ifndef ParaSet_cpp
-#define ParaSet_cpp
+#ifndef ParaSet_H
+#define ParaSet_H
 #include "any.hpp"
+#include <iostream>
 #include <unordered_map>
+#include <vector>
 //create or set a parameter named pt with initial value 10 : setPara("pt", 10)
 //get a exist parameter named pt : getPara("pt")
 //create a new parameter named pt with inital value 10 : addPara("pt", 10)
@@ -11,6 +13,7 @@ class ParaSetBase{
 				ParaSetBase(){};
 				ParaSetBase(const char * name) : set_name(name){};
 				~ParaSetBase(){
+						table.clear();
 				}
 				bool exists(std::string name){
 						return  table.find(name) == table.end() ? 0 : 1;
@@ -18,7 +21,7 @@ class ParaSetBase{
 				template <typename T>
 						bool addPara(const char* pname, const T & val){
 								if(exists(pname)){
-										std::cout<<"parameter: "<<pname<<" exists in the Set"<<endl;
+										std::cout<<"parameter: "<<pname<<" exists in the Set"<<std::endl;
 										return 1;
 								}
 								table[pname] = any(T(val));
@@ -32,7 +35,7 @@ class ParaSetBase{
 				template <typename T>
 						T getPara(const char* pname){
 								if(!exists(pname)) {
-										std::cout<<"parameter '"<<pname<<"' haven't been  defined in the ParaSet:"<<set_name<<endl;
+										std::cout<<"parameter '"<<pname<<"' haven't been  defined in the ParaSet:"<<set_name<<std::endl;
 										return 1;
 								}
 								return any_cast<T>(table[pname]);
@@ -41,7 +44,7 @@ class ParaSetBase{
 				template <typename T>
 						T securePara(const char* pname, T def){
 								if(!exists(pname)) {
-										std::cout<<"parameter '"<<pname<<"' not defined! using defalut value."<<endl;
+										std::cout<<"parameter '"<<pname<<"' not defined! using defalut value."<<std::endl;
 										setPara<T>(pname, def);
 										return T(def);
 								}
@@ -82,11 +85,11 @@ class ParaSet : public ParaSetBase{
 				template <typename T>
 						T getVPara(const char * pname, int i){
 								if(!existsV(pname)) {
-										std::cout<<"parameter vector '"<<pname<<"' haven't been  defined in the ParaSet:"<<set_name<<endl;
+										std::cout<<"parameter vector '"<<pname<<"' haven't been  defined in the ParaSet:"<<set_name<<std::endl;
 										return NAN;
 								}
-								if( vtable[pname]->size()<=i) {
-										std::cout<<"exceeds the length of parameter vector '"<<pname<<"'->("<<vtable[pname]->size()<<") in "<<set_name<<endl;
+								if( vtable[pname]->size()<=size_t(i)) {
+										std::cout<<"exceeds the length of parameter vector '"<<pname<<"'->("<<vtable[pname]->size()<<") in "<<set_name<<std::endl;
 										return NAN;
 								}
 								return any_cast<T>(vtable[pname]->at(i));
@@ -134,12 +137,12 @@ class ParaSet : public ParaSetBase{
 				template <typename T>
 						bool setParaVector(const char* pname, int n, const T* arr){
 								if(existsV(pname)){
-										std::cout<<"parameter vector '"<<pname<<"' exists in the ParaSet:"<<set_name<<endl;
+										std::cout<<"parameter vector '"<<pname<<"' exists in the ParaSet:"<<set_name<<std::endl;
 										return 1;
 								}
 								vtable[pname] = new std::vector<any>();
 								vtable[pname]->reserve(size_t(n));
-								for(auto jj = 0; jj<size_t(n); ++jj){
+								for(size_t jj = 0; jj<size_t(n); ++jj){
 										vtable[pname]->push_back(any(arr[jj]));
 								}
 								return 0;

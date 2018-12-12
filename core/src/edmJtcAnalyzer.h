@@ -37,7 +37,7 @@ class edmJtcAnalyzer: public rootEDMAnalyzer{
 				 std::vector<float> *pt=0;
 				 std::vector<float> *eta=0;
 				 std::vector<float> *phi=0;
-				 std::vector<int > *chg=0;
+				 std::vector<int >  *chg=0;
 				 std::vector<float> *jtpt=0;
 				 std::vector<float> *jteta=0;
 				 std::vector<float> *jtphi=0;
